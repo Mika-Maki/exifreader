@@ -1,5 +1,8 @@
 <!-- Thanks for contributing to exifreader! Please fill in the sections below. -->
 
+<!-- 中文文档:https://github.com/OWNER/exifreader/blob/main/docs/zh-CN/README.md -->
+<!-- English docs: https://github.com/OWNER/exifreader/blob/main/docs/README.md -->
+
 ## Summary
 
 <!-- What does this change do, and why? One or two sentences. -->

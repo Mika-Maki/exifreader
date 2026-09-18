@@ -2,6 +2,7 @@
 #   make            build build/exifreader
 #   make test       build and run the end-to-end suite
 #   make debug      ASan + UBSan build (then run the suite by hand)
+#   make ubsan      UBSan-only build, for kernels where ASan cannot start
 #   make install    install into $(DESTDIR)$(PREFIX)
 #   make format     reformat src/ with clang-format
 #   make dist       source tarball of HEAD (requires a git checkout)
@@ -21,7 +22,7 @@ HEADERS  := $(wildcard src/*.hpp)
 OBJ      := $(SRC:src/%.cpp=build/obj/%.o)
 BIN      := build/exifreader
 
-.PHONY: all clean test fixtures run debug install uninstall format format-check dist help
+.PHONY: all clean test fixtures run debug ubsan install uninstall format format-check dist help
 
 all: $(BIN)
 
@@ -34,6 +35,12 @@ build/obj/%.o: src/%.cpp $(HEADERS)
 
 debug: CXXFLAGS := -std=c++17 -O0 -g -fsanitize=address,undefined -Wall -Wextra -Wpedantic
 debug: clean all
+
+# UBSan without ASan. Use this on kernels whose user virtual address space is too
+# small for the ASan shadow mapping (some Android/Termux kernels abort at startup
+# with "heap size ... exceeds max user virtual address").
+ubsan: CXXFLAGS := -std=c++17 -O0 -g -fsanitize=undefined -fno-sanitize-recover=all -Wall -Wextra -Wpedantic
+ubsan: clean all
 
 fixtures:
 	python3 tests/make_fixtures.py tests/fixtures

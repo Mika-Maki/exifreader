@@ -100,6 +100,19 @@ jobs:
             ./build/exifreader "$mode" tests/fixtures/sample.jpg >/dev/null
           done
 
+  docs:
+    name: docs and i18n
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check translation coverage and jump links
+        run: ./scripts/check-i18n.sh
+
+      - name: Check documentation links and code fences
+        run: ./scripts/check-docs-links.sh
+
   formatting:
     name: clang-format (advisory)
     runs-on: ubuntu-latest

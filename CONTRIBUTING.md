@@ -1,5 +1,7 @@
 # Contributing to exifreader
 
+**English** | [简体中文](CONTRIBUTING.zh-CN.md)
+
 Thanks for taking the time to contribute. This document describes how to build
 the project, what the code is expected to look like, and how to get a change
 merged.
@@ -51,10 +53,14 @@ cmake --build build-cmake -j
 | `src/` | the reader: container sniffing, TIFF parser, tag dictionaries, renderers, CLI |
 | `tests/run_tests.sh` | end-to-end assertions over every output mode, including malformed input |
 | `tests/make_fixtures.py` | generates the fixtures with known on-disk byte layouts |
+| `docs/` | long-form documentation in English and Simplified Chinese, see [docs/i18n.md](docs/i18n.md) |
 | `.github/workflows/` | CI, sanitizers and the release pipeline |
 | `scripts/` | release and publishing helpers |
 
 `tests/fixtures/` is generated, not committed - `make fixtures` recreates it.
+
+If ASan cannot start on your kernel (some Android/Termux kernels map user space
+below 40 bits), use `make ubsan` for a UBSan-only build.
 
 ## Coding style
 
@@ -97,6 +103,25 @@ make test                                  # the whole suite
 
 CI additionally runs the suite under ASan+UBSan and once per compiler, so a
 change that only passes locally will be caught.
+
+## Documentation and translations
+
+English is the canonical documentation language and Simplified Chinese is
+maintained alongside it. The rules - what is translated, what deliberately is
+not, and how a new language is added - live in [docs/i18n.md](docs/i18n.md).
+
+* Every translated page carries a language switcher on its first content line.
+* When you change an English page, update its translation in the same pull
+  request. If you cannot, say so in the pull request rather than letting it
+  drift silently.
+* Run the check before pushing:
+
+  ```sh
+  ./scripts/check-i18n.sh
+  ```
+
+  It fails when a translation is missing or a switcher does not point at its
+  counterpart, and CI runs it as the `docs and i18n` job.
 
 ## Commit messages
 

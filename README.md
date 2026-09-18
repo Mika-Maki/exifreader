@@ -1,5 +1,7 @@
 # exifreader - Image EXIF Information-Tree Reader
 
+**English** | [简体中文](README.zh-CN.md)
+
 [![CI](https://github.com/OWNER/exifreader/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/OWNER/exifreader/actions/workflows/codeql.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/codeql.yml)
 [![Release](https://github.com/OWNER/exifreader/actions/workflows/release.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/release.yml)
@@ -203,8 +205,19 @@ vendor block), a JPEG with no metadata, plus truncated, cyclic, absurd-count,
 out-of-file-pointer, empty and non-image files.
 
 CI runs the suite with g++ and clang++, through both the Make and CMake
-builds, and again under ASan + UBSan. The suite is also UBSan-clean over the
-whole fixture set in every mode.
+builds, and again under ASan + UBSan.
+
+ASan needs a kernel with a large enough user virtual address space. On kernels
+that map user space below 40 bits - some Android/Termux kernels - it aborts at
+startup with `heap size ... exceeds max user virtual address`. Use the UBSan-only
+build there:
+
+```sh
+make ubsan && ./tests/run_tests.sh build/exifreader     # UBSan, no ASan
+make debug && ./tests/run_tests.sh build/exifreader     # ASan + UBSan
+```
+
+The suite is clean under both over the whole fixture set, in every mode.
 
 ## Robustness notes
 
@@ -243,6 +256,19 @@ The pre-release hardening pass that produced these rules is summarised in
   the container scan but not decoded.
 * Thumbnail extraction writes the embedded JPEG/strip data verbatim; it does not
   re-encode or verify the extracted image.
+
+## Documentation
+
+* [docs/](docs/README.md) - the documentation index.
+* [Usage guide](docs/en/usage.md) - every mode, option, exit code and recipe.
+* [Architecture](docs/en/architecture.md) - pipeline, offset model, safety invariants.
+* [Format support](docs/en/formats.md) - containers, field types, MakerNote vendors.
+* [FAQ](docs/en/faq.md) - the questions people actually ask.
+* [i18n policy](docs/i18n.md) - languages, what is translated and what is not.
+
+中文文档:[README](README.zh-CN.md)、[使用指南](docs/zh-CN/usage.md)、
+[架构说明](docs/zh-CN/architecture.md)、[格式支持](docs/zh-CN/formats.md)、
+[常见问题](docs/zh-CN/faq.md)。
 
 ## Contributing
 

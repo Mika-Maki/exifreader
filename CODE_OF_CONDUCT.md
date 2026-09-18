@@ -1,5 +1,13 @@
 # Contributor Covenant Code of Conduct
 
+> **Language:** this document reproduces the Contributor Covenant text and is
+> kept in English, because the enforcement ladder is quoted verbatim in reports.
+> Official translations - including
+> [简体中文](https://www.contributor-covenant.org/zh-cn/version/2/1/code_of_conduct/) -
+> are published at
+> [contributor-covenant.org/translations](https://www.contributor-covenant.org/translations).
+> Chinese documentation for this project: [docs/zh-CN/](docs/zh-CN/README.md).
+
 ## Our Pledge
 
 We as members, contributors, and leaders pledge to make participation in our

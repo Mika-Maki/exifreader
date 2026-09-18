@@ -5,6 +5,11 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+> **Language:** this file is maintained in English only - see
+> [docs/i18n.md](docs/i18n.md) for why. Chinese documentation:
+> [README.zh-CN.md](README.zh-CN.md) ·
+> [docs/zh-CN/](docs/zh-CN/README.md).
+
 ## [Unreleased]
 
 Nothing yet.
@@ -44,6 +49,16 @@ The first public release.
   mode, driven by generated fixtures (`tests/make_fixtures.py`) with known
   on-disk byte layouts for JPEG, PNG, TIFF, big-endian TIFF, BigTIFF, HEIF and
   two MakerNote layouts.
+* **Documentation set** in `docs/`: a usage guide, an architecture guide with
+  the offset model and the safety invariants, a format/tag support matrix and a
+  FAQ - each in English and Simplified Chinese.
+* **Internationalisation**: Simplified Chinese editions of the README,
+  CONTRIBUTING, SECURITY and AI disclosure; a language switcher on every
+  translated page; `docs/i18n.md` defining what is translated and what is not;
+  and `scripts/check-i18n.sh`, enforced by the CI `docs and i18n` job, which
+  fails the build on a missing translation or a broken switcher.
+* **AI disclosure**: `AI_DISCLOSURE.md` (and its Chinese edition) plus an
+  AI-generated badge and notice in the README.
 * Make and CMake builds; `make debug` for an ASan+UBSan build.
 * GitHub Actions CI (gcc/clang, CMake, sanitizers, formatting) and a tagged
   release workflow that attaches checksummed binaries to a GitHub Release.

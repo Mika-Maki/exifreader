@@ -1,5 +1,7 @@
 # AI Disclosure
 
+**English** | [简体中文](AI_DISCLOSURE.zh-CN.md)
+
 ## This project is AI-generated
 
 **exifreader is an AI project.** The source code, tests, fixtures, documentation
