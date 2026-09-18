@@ -19,13 +19,12 @@ Makefile        text eol=lf
 *.bin           binary
 *.o             binary
 
-# Generated or noisy paths: keep them out of "Download ZIP" / release archives.
-/build/         export-ignore
-/build-*/       export-ignore
-/.github/       export-ignore
+# Keep build output out of "Download ZIP" and the release archives. Everything
+# else, .github/ and the dotfiles included, IS part of the source snapshot: a
+# tarball that silently omits the workflows and templates is not the project.
+/build/          export-ignore
+/build-*/        export-ignore
 /tests/fixtures/ export-ignore
-.gitattributes  export-ignore
-.gitignore      export-ignore
 
 # Diffusion and language stats: stop the web UI from calling this project "C".
 tests/fixtures/* linguist-generated
