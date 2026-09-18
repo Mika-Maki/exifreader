@@ -14,8 +14,12 @@
 请**不要**为安全问题开公开 Issue。
 
 请通过 GitHub 的
-[私密安全公告](https://github.com/Mika-Maki/exifreader/security/advisories/new)
-表单报告,或发邮件至 **security@example.com**。
+[私密漏洞报告](https://github.com/Mika-Maki/exifreader/security/advisories/new)
+表单提交。它会创建一个只有维护者可见的私密公告,并且是本项目**唯一**支持的报告渠道:
+**没有安全邮箱**,请不要等待某封邮件的回复。
+
+若你无法使用 GitHub 表单,请开一个 Issue,只说明你发现了漏洞、需要一个私密渠道 ——
+不要在 Issue 里描述问题本身 —— 维护者会安排其他方式。
 
 请尽量附上:
 

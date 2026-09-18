@@ -9,8 +9,9 @@ merged.
 ## Code of Conduct
 
 This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By
-participating you are expected to uphold it. Report unacceptable behavior to
-**conduct@example.com**.
+participating you are expected to uphold it. Report unacceptable behavior
+through the channels listed in
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md#enforcement).
 
 ## Ways to contribute
 

@@ -6,8 +6,8 @@
 
 ## 社区准则
 
-本项目遵循[贡献者公约](CODE_OF_CONDUCT.md)。参与即表示你遵守它。请将不可接受的行为
-报告至 **conduct@example.com**。
+本项目遵循[贡献者公约](CODE_OF_CONDUCT.md)。参与即表示你遵守它。请按
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md#enforcement) 中列出的渠道报告不可接受的行为。
 
 ## 贡献方式
 

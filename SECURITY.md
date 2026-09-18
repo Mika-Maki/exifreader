@@ -13,9 +13,15 @@
 
 Please **do not** open a public issue for a security problem.
 
-Report it privately through GitHub's
-[private security advisory](https://github.com/Mika-Maki/exifreader/security/advisories/new)
-form, or email **security@example.com**.
+Report it through GitHub's
+[private vulnerability reporting](https://github.com/Mika-Maki/exifreader/security/advisories/new)
+form. It opens a private advisory that only the maintainers can see, and it is
+the only supported channel for this project: **there is no security email
+address**, so please do not wait for a reply on one.
+
+If you cannot use GitHub's form, open an issue that says only that you have a
+vulnerability and need a private channel - do not describe the problem there -
+and a maintainer will arrange an alternative.
 
 Include, where you can:
 
