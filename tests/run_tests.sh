@@ -155,6 +155,42 @@ expect_exit 1 $? "unknown option rejected"
 "$BIN" > /dev/null 2>&1
 expect_exit 1 $? "no arguments prints usage and fails"
 
+# ------------------------------------------------------------ limits and exits
+# --max-nodes must validate like --max-depth: junk is an error, an absurd value
+# is clamped with a note, and a negative literal must not wrap through strtoull.
+"$BIN" --max-nodes abc "$FIX/sample.jpg" > "$TMP/mn_bad.txt" 2>&1
+expect_exit 1 $? "--max-nodes rejects a non-numeric value"
+expect_contains "$TMP/mn_bad.txt" "needs a positive integer" "--max-nodes junk message"
+"$BIN" --max-nodes 1e5 "$FIX/sample.jpg" > "$TMP/mn_exp.txt" 2>&1
+expect_exit 1 $? "--max-nodes rejects trailing junk"
+"$BIN" --max-nodes 99999999999 --summary "$FIX/sample.jpg" > "$TMP/mn_big.txt" 2>&1
+expect_contains "$TMP/mn_big.txt" "clamped to 10000000" "--max-nodes clamps an oversized budget"
+"$BIN" --max-nodes -3 --summary "$FIX/sample.jpg" > "$TMP/mn_neg.txt" 2>&1
+expect_contains "$TMP/mn_neg.txt" "clamped to 1" "--max-nodes clamps a negative budget"
+"$BIN" --max-depth 9999 --summary "$FIX/sample.jpg" > "$TMP/md_big.txt" 2>&1
+expect_contains "$TMP/md_big.txt" "clamped to 256" "--max-depth clamps an oversized depth"
+
+# Exit status 2 must mean one thing and say one thing, in every mode.
+"$BIN" "$FIX/nometa.jpg" > "$TMP/e2_tree.txt" 2>&1
+expect_exit 2 $? "no-EXIF file exits 2 (tree)"
+expect_contains "$TMP/e2_tree.txt" "no EXIF data" "no-EXIF message in the tree"
+"$BIN" --tags "$FIX/nometa.jpg" > "$TMP/e2_tags.txt" 2>&1
+expect_contains "$TMP/e2_tags.txt" "no EXIF data" "no-EXIF message in --tags"
+"$BIN" --summary "$FIX/nometa.jpg" > "$TMP/e2_sum.txt" 2>&1
+expect_contains "$TMP/e2_sum.txt" "no EXIF data" "no-EXIF message in --summary"
+"$BIN" --json "$FIX/nometa.jpg" > "$TMP/e2.json" 2>&1
+if $PY -c "
+import json
+d = json.load(open('$TMP/e2.json'))
+assert d['exif']['found'] is False
+assert d['exif']['error'] == 'no EXIF data'
+assert 'ifds' not in d['exif']
+" >/dev/null 2>&1; then
+    ok "JSON failure shape carries the same reason"
+else
+    bad "JSON failure shape carries the same reason"
+fi
+
 echo
 echo "passed: $PASS  failed: $FAIL"
 [ "$FAIL" -eq 0 ]
