@@ -1,7 +1,7 @@
 <!-- Thanks for contributing to exifreader! Please fill in the sections below. -->
 
-<!-- 中文文档:https://github.com/OWNER/exifreader/blob/main/docs/zh-CN/README.md -->
-<!-- English docs: https://github.com/OWNER/exifreader/blob/main/docs/README.md -->
+<!-- 中文文档:https://github.com/Mika-Maki/exifreader/blob/main/docs/zh-CN/README.md -->
+<!-- English docs: https://github.com/Mika-Maki/exifreader/blob/main/docs/README.md -->
 
 ## Summary
 

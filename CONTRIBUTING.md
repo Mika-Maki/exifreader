@@ -30,7 +30,7 @@ Requirements: a C++17 compiler (`g++` or `clang++`), `make`, and Python 3
 (stdlib only) for the fixture generator. CMake ≥ 3.16 is optional.
 
 ```sh
-git clone https://github.com/OWNER/exifreader.git
+git clone https://github.com/Mika-Maki/exifreader.git
 cd exifreader
 
 make            # -> build/exifreader

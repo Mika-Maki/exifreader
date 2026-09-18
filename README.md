@@ -2,9 +2,9 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-[![CI](https://github.com/OWNER/exifreader/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/OWNER/exifreader/actions/workflows/codeql.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/codeql.yml)
-[![Release](https://github.com/OWNER/exifreader/actions/workflows/release.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/release.yml)
+[![CI](https://github.com/Mika-Maki/exifreader/actions/workflows/ci.yml/badge.svg)](https://github.com/Mika-Maki/exifreader/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Mika-Maki/exifreader/actions/workflows/codeql.yml/badge.svg)](https://github.com/Mika-Maki/exifreader/actions/workflows/codeql.yml)
+[![Release](https://github.com/Mika-Maki/exifreader/actions/workflows/release.yml/badge.svg)](https://github.com/Mika-Maki/exifreader/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.cppreference.com/w/cpp/17)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](#build)
@@ -83,7 +83,7 @@ No third-party libraries are used. `tests/make_fixtures.py` (stdlib-only
 Python 3) generates the test images.
 
 ```sh
-git clone https://github.com/OWNER/exifreader.git
+git clone https://github.com/Mika-Maki/exifreader.git
 cd exifreader
 
 make                 # -> build/exifreader
@@ -113,7 +113,7 @@ Useful options and targets:
 | `cmake -DEXIFREADER_WERROR=ON` | treat compiler warnings as errors |
 
 Prebuilt binaries for tagged releases are attached to the
-[releases page](https://github.com/OWNER/exifreader/releases) together with
+[releases page](https://github.com/Mika-Maki/exifreader/releases) together with
 `SHA256SUMS`.
 
 ## Usage

@@ -2,9 +2,9 @@
 
 [English](README.md) | **简体中文**
 
-[![CI](https://github.com/OWNER/exifreader/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/OWNER/exifreader/actions/workflows/codeql.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/codeql.yml)
-[![Release](https://github.com/OWNER/exifreader/actions/workflows/release.yml/badge.svg)](https://github.com/OWNER/exifreader/actions/workflows/release.yml)
+[![CI](https://github.com/Mika-Maki/exifreader/actions/workflows/ci.yml/badge.svg)](https://github.com/Mika-Maki/exifreader/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Mika-Maki/exifreader/actions/workflows/codeql.yml/badge.svg)](https://github.com/Mika-Maki/exifreader/actions/workflows/codeql.yml)
+[![Release](https://github.com/Mika-Maki/exifreader/actions/workflows/release.yml/badge.svg)](https://github.com/Mika-Maki/exifreader/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.cppreference.com/w/cpp/17)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](#构建)
@@ -76,7 +76,7 @@
 `tests/make_fixtures.py`(仅用 Python 3 标准库)负责生成测试图片。
 
 ```sh
-git clone https://github.com/OWNER/exifreader.git
+git clone https://github.com/Mika-Maki/exifreader.git
 cd exifreader
 
 make                 # -> build/exifreader
@@ -105,7 +105,7 @@ cmake --install build-cmake --prefix /usr/local
 | `make dist` | 在 `dist/` 生成 `HEAD` 的源码包与校验和 |
 | `cmake -DEXIFREADER_WERROR=ON` | 把编译警告当作错误 |
 
-带标签的发布版本会在[发布页](https://github.com/OWNER/exifreader/releases)附带预编译
+带标签的发布版本会在[发布页](https://github.com/Mika-Maki/exifreader/releases)附带预编译
 二进制与 `SHA256SUMS`。
 
 ## 用法

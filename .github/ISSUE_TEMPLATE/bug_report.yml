@@ -12,8 +12,8 @@ body:
         we want.
 
         **Do not report security vulnerabilities here** - use the
-        [private advisory form](https://github.com/OWNER/exifreader/security/advisories/new)
-        instead. See [SECURITY.md](https://github.com/OWNER/exifreader/blob/main/SECURITY.md).
+        [private advisory form](https://github.com/Mika-Maki/exifreader/security/advisories/new)
+        instead. See [SECURITY.md](https://github.com/Mika-Maki/exifreader/blob/main/SECURITY.md).
 
   - type: checkboxes
     id: preflight

@@ -2,8 +2,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/OWNER/exifreader/security/advisories/new
+    url: https://github.com/Mika-Maki/exifreader/security/advisories/new
     about: Report a vulnerability privately. Please do not open a public issue.
   - name: Questions and usage help
-    url: https://github.com/OWNER/exifreader/discussions
+    url: https://github.com/Mika-Maki/exifreader/discussions
     about: Ask how to use exifreader, or discuss metadata formats and tooling.

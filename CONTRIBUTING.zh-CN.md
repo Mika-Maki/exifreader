@@ -25,7 +25,7 @@
 测试样例)。CMake >= 3.16 可选。
 
 ```sh
-git clone https://github.com/OWNER/exifreader.git
+git clone https://github.com/Mika-Maki/exifreader.git
 cd exifreader
 
 make            # -> build/exifreader

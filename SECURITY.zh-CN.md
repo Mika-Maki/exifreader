@@ -14,7 +14,7 @@
 请**不要**为安全问题开公开 Issue。
 
 请通过 GitHub 的
-[私密安全公告](https://github.com/OWNER/exifreader/security/advisories/new)
+[私密安全公告](https://github.com/Mika-Maki/exifreader/security/advisories/new)
 表单报告,或发邮件至 **security@example.com**。
 
 请尽量附上:

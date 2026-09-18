@@ -14,7 +14,7 @@
 Please **do not** open a public issue for a security problem.
 
 Report it privately through GitHub's
-[private security advisory](https://github.com/OWNER/exifreader/security/advisories/new)
+[private security advisory](https://github.com/Mika-Maki/exifreader/security/advisories/new)
 form, or email **security@example.com**.
 
 Include, where you can:

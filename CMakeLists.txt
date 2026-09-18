@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(exifreader
   VERSION 1.0.0
   DESCRIPTION "Image EXIF information-tree reader"
-  HOMEPAGE_URL "https://github.com/OWNER/exifreader"
+  HOMEPAGE_URL "https://github.com/Mika-Maki/exifreader"
   LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -58,7 +58,7 @@ set(CPACK_PACKAGE_VENDOR "exifreader contributors")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
     "Dependency-free C++17 EXIF/TIFF information-tree reader")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/OWNER/exifreader")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/Mika-Maki/exifreader")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 include(CPack)
