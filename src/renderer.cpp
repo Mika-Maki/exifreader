@@ -50,9 +50,7 @@ void renderNode(const IfdNode& node, std::size_t depth, const RenderOptions& opt
     for (const TagEntry& t : node.tags) {
         if (linesLeft <= 0) return;
         os << indent << "    " << tagLabel(t);
-        if (opt.showTypes) {
-            os << "  : " << typeAndCount(t) << (t.inlineValue ? " inline" : "");
-        }
+        os << "  : " << typeAndCount(t) << (t.inlineValue ? " inline" : "");
         if (opt.showValues) os << " = " << t.value;
         if (!t.status.empty()) os << "  [!] " << t.status;
         if (opt.showRaw && !t.raw.empty()) {
@@ -99,12 +97,18 @@ void collectTagLines(const IfdNode& node, const std::string& prefix, const Rende
         std::string line = path + " | " + name + " (" + idbuf + ") | ";
         if (opt.showValues) line += t.value;
         line += " | ";
-        if (opt.showTypes) line += typeAndCount(t);
+        line += typeAndCount(t);
         if (!t.status.empty()) line += " | " + t.status;
         out.push_back(line);
         if (out.size() > 500000) return;
     }
     for (const IfdNode& c : node.children) collectTagLines(c, path, opt, out);
+}
+
+// Why a parse produced nothing. Shared by every renderer so the tree, tags,
+// summary and JSON outputs say the same thing for exit status 2.
+std::string noDataReason(const ParseResult& parsed) {
+    return parsed.error.empty() ? "no EXIF data" : parsed.error;
 }
 
 }  // namespace
@@ -126,9 +130,7 @@ std::string renderTree(const ContainerInfo& container, const ParseResult& parsed
     }
 
     if (!parsed.ok) {
-        os << " +- no EXIF data";
-        if (!parsed.error.empty()) os << " (" << parsed.error << ")";
-        os << "\n";
+        os << " +- " << noDataReason(parsed) << "\n";
         return os.str();
     }
 
@@ -157,7 +159,7 @@ std::string renderTags(const ContainerInfo& container, const ParseResult& parsed
     (void)container;
     if (!parsed.ok) {
         os << (opt.sourceName.empty() ? "<input>" : opt.sourceName) << " | ERROR | "
-           << (parsed.error.empty() ? "no EXIF data" : parsed.error) << "\n";
+           << noDataReason(parsed) << "\n";
         return os.str();
     }
     std::vector<std::string> lines;
@@ -257,7 +259,9 @@ std::string renderJson(const ContainerInfo& container, const ParseResult& parsed
     }
     os << "]\n  },\n  \"exif\": {\n    \"found\": " << (parsed.ok ? "true" : "false") << ",\n";
     if (!parsed.ok) {
-        os << "    \"error\": "; jsonString(os, parsed.error); os << "\n  }\n}\n";
+        os << "    \"error\": ";
+        jsonString(os, noDataReason(parsed));
+        os << "\n  }\n}\n";
         return os.str();
     }
     os << "    \"tiffOffset\": \"" << hexOf(parsed.tiffBaseAbs) << "\",\n";
@@ -291,8 +295,7 @@ std::string renderSummary(const ContainerInfo& container, const ParseResult& par
     os << containerName(container.kind);
     if (container.width || container.height) os << " " << container.width << "x" << container.height;
     if (!parsed.ok) {
-        os << ", no EXIF";
-        if (!parsed.error.empty()) os << " (" << parsed.error << ")";
+        os << ", " << noDataReason(parsed);
         return os.str();
     }
     os << (parsed.header.endian == Endian::Little ? ", little" : ", big") << "-endian";
