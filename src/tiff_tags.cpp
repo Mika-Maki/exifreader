@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <deque>
 #include <map>
 #include <mutex>
 #include <unordered_map>
@@ -908,9 +909,15 @@ Table tableFor(IfdKind kind, const char* maker) {
 // runtime for free on first use).
 using Index = std::unordered_map<std::uint16_t, const TagInfo*>;
 
+// The cache is a deque rather than a vector on purpose: indexFor() hands out a
+// reference into it, and the caller keeps using that reference after the lock
+// has been released (see lookupTag() below). push_back on a deque never
+// invalidates references to existing elements, while a vector reallocation
+// would leave every earlier caller holding a dangling reference as soon as one
+// more table is indexed. Do not "simplify" this back to a vector.
 const Index& indexFor(Table t) {
     static std::mutex mu;
-    static std::vector<std::pair<const TagInfo*, Index>> cache;
+    static std::deque<std::pair<const TagInfo*, Index>> cache;
     std::lock_guard<std::mutex> lock(mu);
     for (const auto& entry : cache) {
         if (entry.first == t.data) return entry.second;
