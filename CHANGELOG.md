@@ -14,6 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet.
 
+## [1.0.3] - 2026-09-18
+
+### Fixed
+
+* **The release source archive was not the project.** `export-ignore` rules in
+  `.gitattributes` kept `.github/`, `.gitattributes` and `.gitignore` out of
+  everything produced by `git archive`, which is what the release workflow and
+  `make dist` use. The tarball attached to a release carried 47 of the
+  repository's 58 files: no workflows, no issue or pull request templates, no
+  CODEOWNERS and no Dependabot configuration. Only generated paths are excluded
+  now, so the archive is a faithful snapshot.
+
 ## [1.0.2] - 2026-09-18
 
 ### Added
