@@ -42,8 +42,12 @@ observations about real files.
   a second, independent implementation (for example `exiftool`).
 * **The project is not audited by a human expert.** It has not been through an
   independent security review. The robustness work described in
-  [SECURITY.md](SECURITY.md) was produced by automated analysis (sanitizers,
-  fuzzing, differential testing) plus generated fixes.
+  [SECURITY.md](SECURITY.md) came from automated analysis plus generated fixes,
+  and part of it is reproducible from this repository: the sanitizer runs and a
+  short coverage-guided campaign happen in CI, and the harness itself is here
+  (`fuzz/fuzz_exif.cc`, run with `make fuzz`). The long differential,
+  brute-force and guard-page campaigns behind the 1.0.0 hardening were driven
+  from outside the repository and are **not** reproducible from it.
 * **Licensing.** The generated output is released under the [MIT License](LICENSE).
   As with any generated work, its copyright status may vary by jurisdiction;
   the licence is granted by the publisher of this repository.

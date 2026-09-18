@@ -112,6 +112,9 @@ Notes worth knowing before you parse it:
   values may therefore be either a number or one of those strings.
 * **Output is always valid UTF-8.** Bytes that are not valid UTF-8 in a tag value
   become U+FFFD.
+* **A failed parse has a different shape.** When no EXIF/TIFF data can be parsed
+  (exit status `2`), `exif` is `{"found": false, "error": "no EXIF data"}` and the
+  IFD keys are absent. Check `exif.found` before indexing into `ifds`.
 
 ```sh
 exifreader --json photo.jpg | jq '.exif.ifds[0].tags[] | select(.name == "Make")'
@@ -200,8 +203,8 @@ value meanings the decoder knows.
 |------|---------|---------------|
 | 0 | read successfully, no anomalies | |
 | 1 | usage error, or the file could not be read | bad option, missing file, permission denied |
-| 2 | the file was read but holds no EXIF/TIFF data | PNG without `eXIf`, JPEG without APP1, non-image file |
-| 3 | EXIF was found, but the parse reported warnings | truncated entry, cycle, out-of-file pointer |
+| 2 | the file was read, but no EXIF/TIFF data could be parsed (output: `no EXIF data`) | PNG without `eXIf`, JPEG without APP1, non-image file, a JPEG truncated before its EXIF payload |
+| 3 | EXIF was parsed, but the file reports anomalies (warnings) | truncated entry, directory cycle, out-of-file pointer |
 
 Exit code `3` is a *success with caveats*, not a failure: the useful metadata is
 still on stdout. A script that wants "strictly clean" should test for `0`
@@ -250,7 +253,7 @@ exifreader --json photo.jpg | jq '{warnings: .exif.warnings, ifds: .exif.ifdCoun
 
 ## Troubleshooting
 
-**"no EXIF data found" (exit 2)** - the file has no EXIF/TIFF payload. A PNG
+**"no EXIF data" (exit 2)** - the file has no EXIF/TIFF payload. A PNG
 needs an `eXIf` chunk, a JPEG an `APP1 Exif` segment. HEIC support depends on
 locating the `Exif` item in the ISO-BMFF metadata.
 

@@ -87,7 +87,7 @@ git clone https://github.com/Mika-Maki/exifreader.git
 cd exifreader
 
 make                 # -> build/exifreader
-make test            # build + end-to-end tests (43 assertions)
+make test            # build + run the end-to-end suite
 
 sudo make install    # -> $(PREFIX)/bin/exifreader, PREFIX defaults to /usr/local
 ```
@@ -107,6 +107,7 @@ Useful options and targets:
 | Command | Effect |
 |---------|--------|
 | `make debug` | rebuild with ASan + UBSan |
+| `make fuzz` | coverage-guided fuzzing of the parsers (needs clang) |
 | `make fixtures` | regenerate `tests/fixtures/` |
 | `make format` / `make format-check` | clang-format `src/` (see CONTRIBUTING) |
 | `make dist` | source tarball + checksum of `HEAD` in `dist/` |
@@ -150,8 +151,8 @@ A single `-` reads the image from stdin.
 |------|---------|
 | 0    | EXIF read successfully, no anomalies |
 | 1    | usage error, or the file could not be read |
-| 2    | the file was read but no EXIF/TIFF data was found |
-| 3    | EXIF found, but the file reports anomalies (warnings) |
+| 2    | the file was read, but no EXIF/TIFF data could be parsed (the output says `no EXIF data`) |
+| 3    | EXIF was parsed, but the file reports anomalies (warnings) |
 
 The exit status makes the tool usable as a filter: `3` means the metadata is
 suspect, not that the run failed.
@@ -176,6 +177,7 @@ suspect, not that the run failed.
     src/main.cpp              command line interface
     tests/make_fixtures.py    generates images with known byte layouts
     tests/run_tests.sh        end-to-end test suite
+    fuzz/fuzz_exif.cc         libFuzzer harness for the parsers
     scripts/                  release and publishing helpers
     .github/                  CI, CodeQL, release workflow and templates
 
@@ -196,7 +198,7 @@ observable behaviour of every mode, including malformed inputs.
     $ make test
     exifreader test suite
     ...
-    passed: 43  failed: 0
+    passed: <n>  failed: 0
 
 Fixtures cover a JPEG with the full IFD graph (Exif/GPS/Interop/SubIFD/thumbnail),
 a JPEG without the Make tag, one without GPS/MakerNote, PNG, raw TIFF,
@@ -218,6 +220,14 @@ make debug && ./tests/run_tests.sh build/exifreader     # ASan + UBSan
 ```
 
 The suite is clean under both over the whole fixture set, in every mode.
+
+`fuzz/fuzz_exif.cc` is a libFuzzer harness covering the container sniffer, the
+TIFF parser, all four renderers and thumbnail discovery. CI runs a short
+campaign on every push; run a longer one locally with:
+
+```sh
+make fuzz CXX=clang++ FUZZ_SECONDS=600
+```
 
 ## Robustness notes
 

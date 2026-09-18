@@ -67,8 +67,10 @@ not an edge case, so the security requirements are:
 
 The project is expected to build and pass its suite under ASan and UBSan (the
 CI configuration does both), and to survive coverage-guided fuzzing of the
-parsers. A report that only reproduces under a sanitizer is still a valid
-security report.
+parsers. That is checked rather than asserted: the harness is
+`fuzz/fuzz_exif.cc` and CI runs a short campaign on it, so the same runs can be
+reproduced with `make fuzz CXX=clang++`. A report that only reproduces under a
+sanitizer is still a valid security report.
 
 Out of scope: denial of service caused solely by passing an enormous
 *well-formed* file, and problems in data the tool deliberately prints verbatim

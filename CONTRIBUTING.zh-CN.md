@@ -29,7 +29,7 @@ git clone https://github.com/Mika-Maki/exifreader.git
 cd exifreader
 
 make            # -> build/exifreader
-make test       # 构建 + 端到端套件(43 项)
+make test       # 构建 + 运行端到端套件
 make debug      # ASan + UBSan 构建,并对它跑套件
 ```
 
@@ -48,6 +48,7 @@ cmake --build build-cmake -j
 | `src/` | 读取器:容器嗅探、TIFF 解析、标签字典、渲染器、CLI |
 | `tests/run_tests.sh` | 对各输出模式(含畸形输入)的端到端断言 |
 | `tests/make_fixtures.py` | 生成具有已知磁盘字节布局的测试样例 |
+| `fuzz/` | 解析器的 libFuzzer 载体(`make fuzz`,需要 clang) |
 | `docs/` | 英文与简体中文文档,策略见 [docs/i18n.md](docs/i18n.md) |
 | `.github/workflows/` | CI、CodeQL 与发布流水线 |
 | `scripts/` | 发布与上线脚本 |
@@ -88,6 +89,15 @@ make test                                  # 完整套件
 ```
 
 CI 还会在 ASan+UBSan 下、以及每种编译器下各跑一次,只在本地通过的改动会被拦下。
+
+改动解析器时请额外跑一轮模糊测试:
+
+```sh
+make fuzz CXX=clang++ FUZZ_SECONDS=300
+```
+
+CI 每次推送都会跑一轮短程测试。崩溃会给出它找到的输入(位于 `build/corpus/`)—— 若输入
+很小,请把它留作测试样例,并修复解析器。
 
 ## 提交信息
 

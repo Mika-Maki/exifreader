@@ -35,7 +35,7 @@ git clone https://github.com/Mika-Maki/exifreader.git
 cd exifreader
 
 make            # -> build/exifreader
-make test       # build + the end-to-end suite (43 tests)
+make test       # build + run the end-to-end suite
 make debug      # ASan + UBSan build, then run the suite against it
 ```
 
@@ -54,6 +54,7 @@ cmake --build build-cmake -j
 | `src/` | the reader: container sniffing, TIFF parser, tag dictionaries, renderers, CLI |
 | `tests/run_tests.sh` | end-to-end assertions over every output mode, including malformed input |
 | `tests/make_fixtures.py` | generates the fixtures with known on-disk byte layouts |
+| `fuzz/` | libFuzzer harness over the parsers (`make fuzz`, needs clang) |
 | `docs/` | long-form documentation in English and Simplified Chinese, see [docs/i18n.md](docs/i18n.md) |
 | `.github/workflows/` | CI, sanitizers and the release pipeline |
 | `scripts/` | release and publishing helpers |
@@ -104,6 +105,15 @@ make test                                  # the whole suite
 
 CI additionally runs the suite under ASan+UBSan and once per compiler, so a
 change that only passes locally will be caught.
+
+Changes to the parsers should also get a fuzzing run:
+
+```sh
+make fuzz CXX=clang++ FUZZ_SECONDS=300
+```
+
+CI runs a short campaign on every push. A crash names the input it found, under
+`build/corpus/` - keep it as a fixture if it is small, and fix the parser.
 
 ## Documentation and translations
 

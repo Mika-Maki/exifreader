@@ -103,7 +103,9 @@ exifreader --tags photo.jpg | cut -d'|' -f2 | sort -u
   对象使用 `jq`,或改用 `-s` 只看摘要。
 * **非有限浮点数是字符串。** `"nan"`、`"inf"`、`"-inf"` 以 JSON 字符串输出,因为
   裸 `nan`/`inf` 不是合法 JSON。因此看起来是数字的值,可能是数字,也可能是这几种字符串。
-* **输出恒为合法 UTF-8。** 标签值中非法 UTF-8 字节会被替换为 U+FFFD。
+* **解析失败时结构不同。** 当解析不出任何 EXIF/TIFF 数据时(退出码 `2`),`exif` 为
+  `{"found": false, "error": "no EXIF data"}`,且不含 IFD 相关键。索引 `ifds` 之前请先判断
+  `exif.found`。
 
 ```sh
 exifreader --json photo.jpg | jq '.exif.ifds[0].tags[] | select(.name == "Make")'
@@ -187,8 +189,8 @@ Google、DJI)。每个列表给出标签 id、名称,以及解码器已知的取
 |--------|------|----------|
 | 0 | 读取成功,无异常 | |
 | 1 | 用法错误,或文件无法读取 | 选项错误、文件不存在、权限不足 |
-| 2 | 文件可读,但不含 EXIF/TIFF 数据 | PNG 无 `eXIf` 块、JPEG 无 APP1、非图像文件 |
-| 3 | 找到 EXIF,但解析产生警告 | 条目被截断、成环、指针越界 |
+| 2 | 文件可读,但解析不出 EXIF/TIFF 数据(输出为 `no EXIF data`) | PNG 无 `eXIf` 块、JPEG 无 APP1、非图像文件、EXIF 载荷之前就被截断的 JPEG |
+| 3 | 已解析出 EXIF,但文件存在异常(警告) | 条目被截断、目录成环、指针越界 |
 
 退出码 `3` 是"成功但有保留",不是失败:有用的元数据仍在 stdout 上。想要"严格干净"的
 脚本应显式判断是否为 `0`。
@@ -236,7 +238,7 @@ exifreader --json photo.jpg | jq '{warnings: .exif.warnings, ifds: .exif.ifdCoun
 
 ## 故障排查
 
-**"no EXIF data found"(退出码 2)** —— 文件没有 EXIF/TIFF 载荷。PNG 需要 `eXIf` 块,
+**"no EXIF data"(退出码 2)** —— 文件没有 EXIF/TIFF 载荷。PNG 需要 `eXIf` 块,
 JPEG 需要 `APP1 Exif` 段。HEIC 支持取决于能否在 ISO-BMFF 元数据中定位 `Exif` 项。
 
 **"IFD at 0x... already visited"** —— 文件把某个目录指向了已经用过的偏移。真实文件用它

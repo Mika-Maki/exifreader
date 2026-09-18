@@ -80,7 +80,7 @@ git clone https://github.com/Mika-Maki/exifreader.git
 cd exifreader
 
 make                 # -> build/exifreader
-make test            # 构建 + 端到端测试(43 项断言)
+make test            # 构建 + 运行端到端套件
 
 sudo make install    # -> $(PREFIX)/bin/exifreader,PREFIX 默认 /usr/local
 ```
@@ -100,6 +100,7 @@ cmake --install build-cmake --prefix /usr/local
 | 命令 | 作用 |
 |------|------|
 | `make debug` | 以 ASan + UBSan 重新构建 |
+| `make fuzz` | 对解析器做覆盖率引导的模糊测试(需要 clang) |
 | `make fixtures` | 重新生成 `tests/fixtures/` |
 | `make format` / `make format-check` | 用 clang-format 处理 `src/`(见 CONTRIBUTING) |
 | `make dist` | 在 `dist/` 生成 `HEAD` 的源码包与校验和 |
@@ -143,8 +144,8 @@ cmake --install build-cmake --prefix /usr/local
 |--------|------|
 | 0 | 成功读取 EXIF,无异常 |
 | 1 | 用法错误,或文件无法读取 |
-| 2 | 文件可读,但未找到 EXIF/TIFF 数据 |
-| 3 | 找到 EXIF,但文件存在异常(警告) |
+| 2 | 文件可读,但解析不出 EXIF/TIFF 数据(输出为 `no EXIF data`) |
+| 3 | 已解析出 EXIF,但文件存在异常(警告) |
 
 退出码让它可以当作过滤器使用:`3` 表示元数据可疑,而不是"运行失败"。
 
@@ -168,6 +169,7 @@ cmake --install build-cmake --prefix /usr/local
     src/main.cpp              命令行接口
     tests/make_fixtures.py    生成具有已知字节布局的测试图片
     tests/run_tests.sh        端到端测试套件
+    fuzz/fuzz_exif.cc         解析器的 libFuzzer 测试载体
     scripts/                  发布与上线脚本
     docs/                     文档(英文与简体中文)
     .github/                  CI、CodeQL、发布工作流与模板
@@ -188,7 +190,7 @@ cmake --install build-cmake --prefix /usr/local
     $ make test
     exifreader test suite
     ...
-    passed: 43  failed: 0
+    passed: <n>  failed: 0
 
 测试样例覆盖:带完整 IFD 图(Exif/GPS/Interop/SubIFD/缩略图)的 JPEG、缺少 Make 标签
 的 JPEG、缺少 GPS/MakerNote 的 JPEG、PNG、原始 TIFF、大端 TIFF、HEIF、两种 MakerNote
@@ -208,6 +210,13 @@ make debug && ./tests/run_tests.sh build/exifreader     # ASan + UBSan
 ```
 
 全部样例在两种构建下的所有模式均无告警。
+
+`fuzz/fuzz_exif.cc` 是覆盖容器嗅探、TIFF 解析器、四种渲染器与缩略图发现的
+libFuzzer 载体。CI 每次推送都会跑一轮短程模糊测试;本地可跑更长时间:
+
+```sh
+make fuzz CXX=clang++ FUZZ_SECONDS=600
+```
 
 ## 健壮性说明
 
