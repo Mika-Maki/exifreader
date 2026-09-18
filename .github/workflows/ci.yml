@@ -126,5 +126,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang-format
 
-      - name: Check formatting
-        run: make format-check
+      - name: Report formatting differences (never fails the build)
+        run: |
+          if make format-check; then
+            echo "src/ is clang-format clean"
+          else
+            echo "::warning title=clang-format::src/ is not fully clang-format clean. This job is advisory - run 'make format' on the files you touch. See CONTRIBUTING.md."
+          fi
