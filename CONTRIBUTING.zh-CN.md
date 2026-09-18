@@ -137,6 +137,15 @@ CI 还会在 ASan+UBSan 下、以及每种编译器下各跑一次,只在本地�
 | 个人访问令牌 | 创建令牌(经典:作用域 `repo`;细粒度:`Contents: Read and write`),执行 `git config credential.helper cache`,推送时把令牌当作密码输入 |
 | SSH | 把公钥加到 GitHub,然后 `scripts/publish.sh --owner <你的用户名> --ssh` |
 
+若仓库已存在、只需推送,请用 `scripts/push-token.sh`:它从 `$GIT_TOKEN` 或含
+`GIT_TOKEN=...` 的文件(默认 `~/.env`)读取 token,通过一次性的 `GIT_ASKPASS` 辅助程序
+交给 git,绝不写入 `.git/config`、远端 URL 或终端。`--check` 只体检不推送:
+
+```sh
+scripts/push-token.sh --user <你的用户名> --check
+scripts/push-token.sh --user <你的用户名> --tag v1.0.0
+```
+
 推送要求远端**已存在一个空仓库** —— 请先在 https://github.com/new 创建(不要勾选
 README 或添加许可证),因为推送无法创建仓库。
 

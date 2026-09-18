@@ -162,6 +162,18 @@ with one of:
 | Personal access token | Create a token (classic: scope `repo`; fine-grained: `Contents: Read and write`), run `git config credential.helper cache`, then push and give the token as the password |
 | SSH | Add a key to GitHub, then `scripts/publish.sh --owner <you> --ssh` |
 
+If the repository already exists and you only need to push, use
+`scripts/push-token.sh`. It reads the token from `$GIT_TOKEN` or from a file
+holding `GIT_TOKEN=...` (by default `~/.env`), hands it to git through a
+throwaway `GIT_ASKPASS` helper, and never writes it to `.git/config`, to a
+remote URL or to the terminal. `--check` verifies the token, the identity and
+the remote without pushing:
+
+```sh
+scripts/push-token.sh --user <you> --check
+scripts/push-token.sh --user <you> --tag v1.0.0
+```
+
 The push expects an **existing empty repository** - create it at
 https://github.com/new without a README or a licence, because a push cannot
 create a repository.
