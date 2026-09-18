@@ -149,6 +149,32 @@ Common types: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`,
 5. Open the pull request and fill in the template. CI must be green.
 6. A maintainer reviews; squash-merge is the default.
 
+## Publishing and releases (maintainers)
+
+The repository is published with `scripts/publish.sh`: it rewrites the `OWNER`
+placeholder in badge, clone and advisory links, commits the result and pushes.
+GitHub no longer accepts an account password for git over HTTPS, so authenticate
+with one of:
+
+| Method | What to do |
+|--------|------------|
+| GitHub CLI | `gh auth login`, then `scripts/publish.sh --owner <you>` - it also creates the repository |
+| Personal access token | Create a token (classic: scope `repo`; fine-grained: `Contents: Read and write`), run `git config credential.helper cache`, then push and give the token as the password |
+| SSH | Add a key to GitHub, then `scripts/publish.sh --owner <you> --ssh` |
+
+The push expects an **existing empty repository** - create it at
+https://github.com/new without a README or a licence, because a push cannot
+create a repository.
+
+Never commit a token and never paste one into an issue or a chat. If you typed a
+password at the prompt, nothing was sent to GitHub: the script keeps the commit,
+the remote and the tag, so re-running the push is all that is needed.
+
+To cut a version, run `scripts/release.sh 1.1.0`. It updates the version in
+`src/main.cpp`, `CMakeLists.txt` and `CHANGELOG.md`, commits, tags and pushes;
+the tag triggers the Release workflow, which builds and attaches checksummed
+binaries.
+
 ## Reporting performance or robustness problems
 
 If the reader is slow, or a file makes it misbehave, please include:

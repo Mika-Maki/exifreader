@@ -126,6 +126,27 @@ CI 还会在 ASan+UBSan 下、以及每种编译器下各跑一次,只在本地�
 5. 提交 PR 并填写模板。CI 必须为绿。
 6. 维护者评审;默认使用 squash 合并。
 
+## 发布与发版(维护者)
+
+仓库通过 `scripts/publish.sh` 发布:它会替换徽章、克隆与公告链接中的 `OWNER` 占位符,
+提交结果并推送。GitHub 已不再接受 HTTPS 方式下的账号密码,请用以下方式之一完成认证:
+
+| 方式 | 做法 |
+|------|------|
+| GitHub CLI | `gh auth login`,然后 `scripts/publish.sh --owner <你的用户名>` —— 它还会替你建仓 |
+| 个人访问令牌 | 创建令牌(经典:作用域 `repo`;细粒度:`Contents: Read and write`),执行 `git config credential.helper cache`,推送时把令牌当作密码输入 |
+| SSH | 把公钥加到 GitHub,然后 `scripts/publish.sh --owner <你的用户名> --ssh` |
+
+推送要求远端**已存在一个空仓库** —— 请先在 https://github.com/new 创建(不要勾选
+README 或添加许可证),因为推送无法创建仓库。
+
+绝不要把令牌提交进仓库,也不要粘贴到 Issue 或对话中。如果你在提示符处输入了密码,什么
+都不会发往 GitHub:脚本已保留提交、远端与标签,重新执行推送即可。
+
+发版:运行 `scripts/release.sh 1.1.0`,它会同步更新 `src/main.cpp`、`CMakeLists.txt`
+与 `CHANGELOG.md` 中的版本号,提交、打标签并推送;标签会触发 Release 工作流,构建并附上
+带校验和的二进制。
+
 ## 报告性能或健壮性问题
 
 若读取器变慢,或某个文件让它行为异常,请附上:

@@ -17,6 +17,7 @@
 #   --remote NAME   git remote to use                (default: origin)
 #   --branch NAME   branch to publish                (default: main)
 #   --url URL       remote URL, for GitHub Enterprise or a local test remote
+#   --ssh / --https use an SSH remote (git@github.com:...) instead of HTTPS
 #   --public/--private   repository visibility       (default: public)
 #   --no-create     do not create the GitHub repository, only push
 #   --no-rewrite    do not touch the OWNER placeholders
@@ -32,6 +33,7 @@ REMOTE=${REMOTE:-origin}
 BRANCH=${BRANCH:-main}
 TAG=${TAG:-}
 URL=${URL:-}
+USE_SSH=0
 DRY_RUN=0
 CREATE=1
 REWRITE=1
@@ -49,6 +51,8 @@ while [ $# -gt 0 ]; do
         --remote)     REMOTE=${2:?--remote needs a value}; shift 2 ;;
         --branch)     BRANCH=${2:?--branch needs a value}; shift 2 ;;
         --url)        URL=${2:?--url needs a value}; shift 2 ;;
+        --ssh)        USE_SSH=1; shift ;;
+        --https)      USE_SSH=0; shift ;;
         --private)    VISIBILITY=private; shift ;;
         --public)     VISIBILITY=public; shift ;;
         --no-create)  CREATE=0; shift ;;
@@ -64,7 +68,13 @@ ROOT=$(pwd)
 echo "publish.sh: repository root $ROOT"
 
 [ -n "$OWNER" ] || { echo "publish.sh: --owner (or \$OWNER) is required" >&2; exit 1; }
-[ -n "$URL" ] || URL="https://github.com/$OWNER/$REPO_NAME.git"
+if [ -z "$URL" ]; then
+    if [ "$USE_SSH" = 1 ]; then
+        URL="git@github.com:$OWNER/$REPO_NAME.git"
+    else
+        URL="https://github.com/$OWNER/$REPO_NAME.git"
+    fi
+fi
 
 run() {
     if [ "$DRY_RUN" = 1 ]; then
@@ -179,9 +189,50 @@ else
 fi
 
 # --- 6. push ---------------------------------------------------------------
-run git push -u "$REMOTE" "$BRANCH"
+auth_help() {
+    cat >&2 <<EOF
+
+publish.sh: the push was rejected by GitHub.
+
+GitHub does not accept an account password for git over HTTPS - the password
+prompt expects a personal access token. Pick one of these:
+
+  1. GitHub CLI (easiest - creates the repo and authenticates)
+       gh auth login                      # HTTPS, authenticate in the browser
+       scripts/publish.sh --owner $OWNER --tag $TAG
+
+  2. Personal access token over HTTPS
+       Create a token: https://github.com/settings/tokens
+         classic:      scope "repo"
+         fine-grained: Contents = Read and write
+       Then, keeping the token out of the repository:
+         git config credential.helper cache
+         git push -u $REMOTE $BRANCH        # user: $OWNER  password: <token>
+
+  3. SSH key
+       ssh-keygen -t ed25519 -C "$OWNER@users.noreply.github.com"
+       # add ~/.ssh/id_ed25519.pub at https://github.com/settings/keys
+       git remote set-url $REMOTE git@github.com:$OWNER/$REPO_NAME.git
+       git push -u $REMOTE $BRANCH
+
+If the repository does not exist yet, create it empty (no README, no licence)
+at https://github.com/new?name=$REPO_NAME first - a push cannot create it.
+
+Nothing was lost: the commit, the remote and the $TAG tag are all in place, so
+after authenticating you only need to run the push again.
+EOF
+}
+
+if ! run git push -u "$REMOTE" "$BRANCH"; then
+    auth_help
+    exit 1
+fi
+
 if [ -n "$TAG" ]; then
-    run git push "$REMOTE" "$TAG"
+    if ! run git push "$REMOTE" "$TAG"; then
+        auth_help
+        exit 1
+    fi
     echo "-> the Release workflow will build and attach the binaries for $TAG"
 fi
 
