@@ -3,6 +3,7 @@
 #   make test       build and run the end-to-end suite
 #   make debug      ASan + UBSan build (then run the suite by hand)
 #   make ubsan      UBSan-only build, for kernels where ASan cannot start
+#   make fuzz       libFuzzer campaign over the parsers (needs clang)
 #   make install    install into $(DESTDIR)$(PREFIX)
 #   make format     reformat src/ with clang-format
 #   make dist       source tarball of HEAD (requires a git checkout)
@@ -17,12 +18,20 @@ DESTDIR      ?=
 CLANG_FORMAT ?= clang-format
 VERSION      := $(shell sed -n 's/.*kVersion = "\([^"]*\)".*/\1/p' src/main.cpp)
 
+# libFuzzer needs clang: use "make fuzz CXX=clang++".
+FUZZ_SANITIZERS ?= fuzzer,address
+FUZZ_SECONDS    ?= 60
+FUZZ_CORPUS     ?= tests/fixtures
+FUZZ_BIN        := build/fuzz_exif
+# Recursive on purpose: SRC is defined further down.
+FUZZ_LIB         = $(filter-out src/main.cpp,$(SRC))
+
 SRC      := $(wildcard src/*.cpp)
 HEADERS  := $(wildcard src/*.hpp)
 OBJ      := $(SRC:src/%.cpp=build/obj/%.o)
 BIN      := build/exifreader
 
-.PHONY: all clean test fixtures run debug ubsan install uninstall format format-check dist help
+.PHONY: all clean test fixtures run debug ubsan fuzz install uninstall format format-check dist help
 
 all: $(BIN)
 
@@ -44,6 +53,19 @@ ubsan: clean all
 
 fixtures:
 	python3 tests/make_fixtures.py tests/fixtures
+
+# Coverage-guided fuzzing of the parsers. Needs clang (libFuzzer). The corpus
+# starts from the generated fixtures; new interesting inputs are written to
+# build/corpus, which is git-ignored.
+fuzz: $(FUZZ_BIN)
+	@mkdir -p build/corpus
+	@test -f tests/fixtures/sample.jpg || $(MAKE) fixtures
+	$(FUZZ_BIN) -max_total_time=$(FUZZ_SECONDS) $(FUZZ_CORPUS) build/corpus
+
+$(FUZZ_BIN): fuzz/fuzz_exif.cc $(SRC) $(HEADERS)
+	@mkdir -p $(dir $@)
+	$(CXX) -std=c++17 -g -O1 -fno-omit-frame-pointer -fsanitize=$(FUZZ_SANITIZERS) \
+	  -Isrc -o $@ fuzz/fuzz_exif.cc $(FUZZ_LIB)
 
 test: all
 	tests/run_tests.sh
