@@ -281,7 +281,31 @@ int main(int argc, char** argv) {
             opt.maxDepth = static_cast<int>(clamped);
             continue;
         }
-        if (a == "--max-nodes") { opt.maxNodes = static_cast<std::size_t>(std::strtoull(needValue("--max-nodes"), nullptr, 10)); continue; }
+        if (a == "--max-nodes") {
+            // Reject junk instead of silently reading it as 0, and clamp the way
+            // --max-depth does: a budget only bounds anything if it cannot be
+            // raised past the point where it stops mattering.
+            const std::string text = needValue("--max-nodes");
+            char* end = nullptr;
+            const unsigned long long requested = std::strtoull(text.c_str(), &end, 10);
+            if (text.empty() || end == text.c_str() || *end != '\0') {
+                std::cerr << kProgram << ": --max-nodes needs a positive integer\n";
+                return 1;
+            }
+            // strtoull() wraps a negative literal into a huge value, so treat a
+            // leading '-' as zero and let the clamp below turn it into the
+            // minimum, the way --max-depth clamps to its own minimum.
+            const bool negative = !text.empty() && text[0] == '-';
+            unsigned long long clamped = negative ? 0ULL : requested;
+            if (clamped < 1) clamped = 1;
+            if (clamped > exif::kMaxIfdNodes) clamped = exif::kMaxIfdNodes;
+            if (clamped != requested) {
+                std::cerr << kProgram << ": --max-nodes clamped to " << clamped
+                          << " (safe range 1.." << exif::kMaxIfdNodes << ")\n";
+            }
+            opt.maxNodes = static_cast<std::size_t>(clamped);
+            continue;
+        }
         if (a == "--extract") { opt.extractDir = needValue("--extract"); continue; }
         if (a == "--list-tags") {
             opt.listTags = true;

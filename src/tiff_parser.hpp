@@ -73,6 +73,11 @@ struct IfdNode {
 // with an inflated limit overflows the stack, so the parser clamps to this (F6).
 constexpr int kMaxIfdDepth = 256;
 
+// Hard ceiling applied to ParseOptions::maxNodes, for the same reason: the
+// budget exists to bound the work a hostile file can cause, so a caller must not
+// be able to raise it to a value that makes the bound meaningless.
+constexpr std::size_t kMaxIfdNodes = 10000000;
+
 struct ParseOptions {
     bool parseMakerNote = true;
     bool parseThumbnailIfd = true;
