@@ -68,33 +68,39 @@ ed() { # file, sed-expression
 ed src/main.cpp    "s/kVersion = \"$CURRENT\"/kVersion = \"$NEXT\"/"
 ed CMakeLists.txt  "s/VERSION $CURRENT/VERSION $NEXT/"
 
-if ! grep -q "^## \[$NEXT\]" CHANGELOG.md; then
-    if [ "$DRY_RUN" = 1 ]; then
-        echo "  [dry-run] add ## [$NEXT] - $DATE to CHANGELOG.md"
-        echo "  [dry-run] point the [Unreleased] compare link at v$NEXT"
-    else
-        slug=$(git remote get-url origin 2>/dev/null | sed -e 's|.*github\.com[:/]||' -e 's|\.git$||')
-        python3 - "$NEXT" "$DATE" "$slug" <<'PY'
+# The section insert and the link refresh are deliberately separate: a maintainer
+# may already have written the release notes by hand, and the compare links still
+# have to be refreshed in that case.
+insert=1
+grep -q "^## \[$NEXT\]" CHANGELOG.md && insert=0
+
+if [ "$DRY_RUN" = 1 ]; then
+    [ "$insert" = 1 ] && echo "  [dry-run] add ## [$NEXT] - $DATE to CHANGELOG.md"
+    echo "  [dry-run] point the [Unreleased] compare link at v$NEXT"
+else
+    slug=$(git remote get-url origin 2>/dev/null | sed -e 's|.*github\.com[:/]||' -e 's|\.git$||')
+    python3 - "$NEXT" "$DATE" "$slug" "$insert" <<'PY'
 import re
 import sys
 
-next_version, date, slug = sys.argv[1], sys.argv[2], sys.argv[3]
+next_version, date, slug, insert = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == '1'
 path = 'CHANGELOG.md'
 text = open(path, encoding='utf-8').read()
 
-# Insert the new section immediately before the first released version, so the
-# [Unreleased] heading and everything under it survive untouched. The previous
-# implementation spliced from '## [Unreleased]' to the first '## [x.y.z]' and
-# silently deleted whatever sat between the two.
-section = (f'## [{next_version}] - {date}\n\n'
-           '### Added\n\n- TODO: describe the release.\n\n'
-           '### Changed\n\n- TODO\n\n'
-           '### Fixed\n\n- TODO\n\n')
-match = re.search(r'(?m)^## \[\d', text)
-if match:
-    text = text[:match.start()] + section + text[match.start():]
-else:
-    text = text.rstrip('\n') + '\n\n' + section
+if insert:
+    # Insert the new section immediately before the first released version, so
+    # the [Unreleased] heading and everything under it survive untouched. The
+    # previous implementation spliced from '## [Unreleased]' to the first
+    # '## [x.y.z]' and silently deleted whatever sat between the two.
+    section = (f'## [{next_version}] - {date}\n\n'
+               '### Added\n\n- TODO: describe the release.\n\n'
+               '### Changed\n\n- TODO\n\n'
+               '### Fixed\n\n- TODO\n\n')
+    match = re.search(r'(?m)^## \[\d', text)
+    if match:
+        text = text[:match.start()] + section + text[match.start():]
+    else:
+        text = text.rstrip('\n') + '\n\n' + section
 
 # Keep the compare links honest: [Unreleased] has to compare from the version we
 # just cut, and the new version needs its release link.
@@ -109,7 +115,6 @@ if slug:
 
 open(path, 'w', encoding='utf-8').write(text)
 PY
-    fi
 fi
 
 # --- commit, tag, push -----------------------------------------------------
