@@ -21,7 +21,7 @@
 namespace {
 
 const char* kProgram = "exifreader";
-const char* kVersion = "1.0.1";
+const char* kVersion = "1.0.2";
 
 struct Options {
     bool json = false;

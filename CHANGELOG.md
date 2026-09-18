@@ -159,6 +159,7 @@ release:
 * Classic MakerNotes embedded in a BigTIFF file were parsed with BigTIFF entry
   widths instead of their own header's format.
 
-[Unreleased]: https://github.com/Mika-Maki/exifreader/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/Mika-Maki/exifreader/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/Mika-Maki/exifreader/releases/tag/v1.0.2
 [1.0.1]: https://github.com/Mika-Maki/exifreader/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Mika-Maki/exifreader/releases/tag/v1.0.0
