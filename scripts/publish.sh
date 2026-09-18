@@ -102,14 +102,14 @@ if [ "$REWRITE" = 1 ]; then
     done
 
     # A leftover placeholder in the working tree means a broken link would ship.
-    leftover=$(grep -RIl -e "$FIND_PLACEHOLDER" . $EXCLUDES 2>/dev/null || true)
+    # (Skipped during --dry-run, where nothing has been patched by design.)
+    leftover=""
+    [ "$DRY_RUN" = 1 ] || leftover=$(grep -RIl -e "$FIND_PLACEHOLDER" . $EXCLUDES 2>/dev/null || true)
     if [ -n "$leftover" ]; then
-        echo "   WARNING: these files still reference $FIND_PLACEHOLDER:" >&2
+        echo "   ERROR: these files still reference $FIND_PLACEHOLDER:" >&2
         printf '     %s\n' $leftover >&2
-        if [ "$DRY_RUN" = 0 ]; then
-            echo "   refusing to publish with broken links" >&2
-            exit 1
-        fi
+        echo "   refusing to publish with broken links" >&2
+        exit 1
     fi
 fi
 
