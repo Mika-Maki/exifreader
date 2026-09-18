@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish a release for (for example v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  binaries:
+    name: binary ${{ matrix.asset }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: exifreader-linux-x86_64
+          - os: macos-latest
+            asset: exifreader-macos-arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: make -j"$(getconf _NPROCESSORS_ONLN)"
+
+      - name: Run test suite
+        run: ./tests/run_tests.sh build/exifreader
+
+      - name: Package
+        run: |
+          set -eu
+          mkdir -p dist
+          cp build/exifreader "dist/${{ matrix.asset }}"
+          tar -czf "dist/${{ matrix.asset }}.tar.gz" -C dist "${{ matrix.asset }}"
+          cd dist
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "${{ matrix.asset }}.tar.gz" > "${{ matrix.asset }}.tar.gz.sha256"
+          else
+            shasum -a 256 "${{ matrix.asset }}.tar.gz" > "${{ matrix.asset }}.tar.gz.sha256"
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}.tar.gz*
+          if-no-files-found: error
+
+  source:
+    name: source archive
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Package source
+        env:
+          REF: ${{ github.ref_name }}
+        run: |
+          set -eu
+          version="${REF#v}"
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="exifreader-${version}/" -o "dist/exifreader-${version}-src.tar.gz" HEAD
+          cd dist
+          sha256sum "exifreader-${version}-src.tar.gz" > "exifreader-${version}-src.tar.gz.sha256"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: source
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    name: publish release
+    needs: [binaries, source]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Generate checksums
+        run: |
+          set -eu
+          cd dist
+          rm -f SHA256SUMS
+          sha256sum *.tar.gz > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            dist/*.tar.gz
+            dist/*.sha256
+            dist/SHA256SUMS

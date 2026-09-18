@@ -1,0 +1,11 @@
+# Code ownership.
+#
+# GitHub only honours real users and teams here, so the default rule is left
+# commented out. Uncomment and replace OWNER after the repository is published.
+#
+# *       @OWNER
+
+# Path-specific rules, most specific last:
+# /src/     @OWNER
+# /tests/   @OWNER
+# /.github/ @OWNER

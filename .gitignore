@@ -1,0 +1,60 @@
+# Build output
+build/
+build-*/
+build-cmake/
+cmake-build-*/
+*.o
+*.obj
+*.lo
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+install_manifest.txt
+compile_commands.json
+.cache/
+
+# Generated test fixtures (recreate with "make fixtures")
+tests/fixtures/
+fixtures/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Editor and IDE state
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.clangd/
+
+# Packaging and release artifacts
+dist/
+release/
+*.tar
+*.tar.gz
+*.tar.xz
+*.zip
+*.sha256
+SHA256SUMS
+
+# OS noise
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+desktop.ini

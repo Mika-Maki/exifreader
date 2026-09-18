@@ -1,0 +1,124 @@
+name: Bug report
+description: Report a crash, a hang, wrong output, or an image the reader mishandles.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a report. Malformed and hostile files
+        are the interesting case - if a file crashes the reader, hangs it, or
+        makes it print something it should not, that is exactly the kind of bug
+        we want.
+
+        **Do not report security vulnerabilities here** - use the
+        [private advisory form](https://github.com/OWNER/exifreader/security/advisories/new)
+        instead. See [SECURITY.md](https://github.com/OWNER/exifreader/blob/main/SECURITY.md).
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checklist
+      options:
+        - label: I searched the existing issues and this has not been reported yet.
+          required: true
+        - label: I am reporting a bug, not a security vulnerability.
+          required: true
+        - label: Any sample file I attach has GPS coordinates, serial numbers and other personal metadata stripped.
+          required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: exifreader version
+      description: Output of `exifreader --version`.
+      placeholder: exifreader 1.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: build
+    attributes:
+      label: How was it built?
+      description: Compiler and version, and whether you used make or CMake. Include sanitizer flags if any.
+      placeholder: g++ 14.2.0, make, no extra flags
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and architecture
+      placeholder: Ubuntu 24.04, x86_64
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command line
+      description: The exact command you ran.
+      render: shell
+      placeholder: ./build/exifreader --json photo.jpg
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Output mode
+      options:
+        - information tree (default)
+        - --tags
+        - --json
+        - --summary
+        - --extract
+        - --list-tags
+        - not mode specific / all of them
+    validations:
+      required: true
+
+  - type: input
+    id: exit-code
+    attributes:
+      label: Exit code
+      description: "0 = ok, 1 = usage/file error, 2 = no EXIF found, 3 = EXIF found with anomalies."
+      placeholder: "3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happened?
+      description: Paste the relevant output. For a crash, include the sanitizer or debugger backtrace if you have one.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample
+    attributes:
+      label: Sample file
+      description: |
+        Attach or link a minimised file that reproduces the problem. A truncated
+        or re-generated sample is ideal. An original photo is often enough, but
+        strip metadata you consider private first - EXIF routinely carries GPS
+        coordinates and device identifiers.
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Other containers, tags or offsets that look relevant.
+    validations:
+      required: false

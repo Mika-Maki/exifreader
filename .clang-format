@@ -1,0 +1,34 @@
+---
+# Coding style for exifreader. See CONTRIBUTING.md.
+Language: Cpp
+BasedOnStyle: LLVM
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Always
+
+PointerAlignment: Left
+DerivePointerAlignment: false
+NamespaceIndentation: None
+FixNamespaceComments: true
+IndentCaseLabels: false
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
+SpacesBeforeTrailingComments: 3
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: false
+Cpp11BracedListStyle: true
+BinPackArguments: true
+BinPackParameters: true
+ReflowComments: true
+SortIncludes: Never
+
+Standard: c++17

@@ -1,0 +1,28 @@
+---
+# Static analysis configuration for exifreader.
+#
+# clang-tidy is advisory: the CI job treats its findings as information, not as
+# a gate. Run it locally with:
+#
+#   clang-tidy -p build src/*.cpp
+Checks: >
+  bugprone-*,
+  cert-*,
+  performance-*,
+  portability-*,
+  -cert-err58-cpp,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-exception-escape,
+  clang-analyzer-*,
+  misc-*,
+  -misc-non-private-member-variables-in-classes,
+  readability-*,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -readability-function-cognitive-complexity,
+  -readability-convert-member-functions-to-static
+
+WarningsAsErrors: ''
+HeaderFilterRegex: 'src/.*\.hpp$'
+FormatStyle: file
+UseColor: true
