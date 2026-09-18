@@ -90,7 +90,6 @@ void scanJpeg(const std::uint8_t* d, std::size_t n, ContainerInfo& info) {
             EmbeddedExif ee;
             ee.found = true;
             ee.payloadOffset = payloadOff + 6;
-            ee.payloadSize = n - ee.payloadOffset;
             ee.note = "APP1 Exif segment at " + hex(markerPos);
             info.exifCandidates.push_back(ee);
         } else if (marker == 0xE1 && payloadLen >= 29 &&
@@ -142,7 +141,6 @@ void scanPng(const std::uint8_t* d, std::size_t n, ContainerInfo& info) {
                 EmbeddedExif ee;
                 ee.found = true;
                 ee.payloadOffset = dataOff;
-                ee.payloadSize = len;
                 ee.note = "PNG eXIf chunk at " + hex(pos) + " (" +
                           (order == Endian::Little ? "little" : "big") + " endian)";
                 info.exifCandidates.push_back(ee);
@@ -338,7 +336,6 @@ void scanHeif(const std::uint8_t* d, std::size_t n, ContainerInfo& info) {
             EmbeddedExif ee;
             ee.found = true;
             ee.payloadOffset = tiffOff;
-            ee.payloadSize = n - tiffOff;
             ee.note = "HEIF Exif item " + std::to_string(id) + " (offset " + hex(off) + ")";
             info.exifCandidates.push_back(ee);
         }
@@ -384,7 +381,6 @@ ContainerInfo detectContainer(const std::uint8_t* d, std::size_t n) {
             EmbeddedExif ee;
             ee.found = true;
             ee.payloadOffset = 0;
-            ee.payloadSize = n;
             ee.note = "file header";
             info.exifCandidates.push_back(ee);
             return info;

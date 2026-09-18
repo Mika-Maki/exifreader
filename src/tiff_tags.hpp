@@ -20,9 +20,6 @@ struct TagInfo {
 // Returns nullptr when the tag is not in the dictionary for that IFD family.
 const TagInfo* lookupTag(IfdKind kind, const char* maker, std::uint16_t id);
 
-// Effective dictionary family for a maker-note tag table.
-IfdKind makerNoteKind(const char* maker);
-
 // Human readable list of the dictionaries compiled into the reader.
 std::vector<std::string> knownTagTables();
 

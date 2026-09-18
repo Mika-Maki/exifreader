@@ -12,9 +12,7 @@ namespace exif {
 
 struct RenderOptions {
     bool showValues = true;
-    bool showTypes = true;
     bool showRaw = false;
-    bool color = false;
     bool showWarnings = true;
     std::string sourceName;   // printed in headers ("<stdin>", "./photo.jpg")
 };

@@ -47,24 +47,6 @@ inline std::int32_t readInt(const std::uint8_t* p, int bytes, Endian e) {
     }
 }
 
-// Convert a little/big endian IEEE-754 value to a native double.
-inline double halfToDouble(std::uint16_t h) {
-    const int sign = (h >> 15) & 1;
-    const int exp = (h >> 10) & 0x1F;
-    const int frac = h & 0x3FF;
-    double v;
-    if (exp == 0) {
-        v = frac / 1024.0 * (1.0 / 16384.0);   // subnormal
-    } else if (exp == 31) {
-        v = frac ? 0.0 : 1.0;                  // NaN/Inf -> 0/1 sentinel handled by caller
-    } else {
-        v = (1.0 + frac / 1024.0);
-        for (int i = 0; i < exp - 15; ++i) v *= 2.0;
-        for (int i = 0; i < 15 - exp; ++i) v /= 2.0;
-    }
-    return sign ? -v : v;
-}
-
 // Length of a well-formed UTF-8 sequence starting at s[i], or 0 when the bytes
 // there are not valid UTF-8. Used to keep hostile tag payloads from producing
 // invalid JSON and to sanitise terminal output.

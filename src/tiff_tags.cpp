@@ -939,8 +939,6 @@ const TagInfo* lookupTag(IfdKind kind, const char* maker, std::uint16_t id) {
     return it == idx.end() ? nullptr : it->second;
 }
 
-IfdKind makerNoteKind(const char*) { return IfdKind::MakerNote; }
-
 const TagInfo* tagTableFor(IfdKind kind, const char* maker, std::size_t& count) {
     const Table t = tableFor(kind, maker);
     count = t.size;

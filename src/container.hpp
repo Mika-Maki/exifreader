@@ -24,7 +24,6 @@ struct EmbeddedExif {
     bool found = false;
     // Byte range of the TIFF header ("II*\0" / "MM\0*") inside the file buffer.
     std::size_t payloadOffset = 0;   // absolute offset of the TIFF header
-    std::size_t payloadSize = 0;     // bytes available from payloadOffset
     std::string note;                // human readable provenance, e.g. "APP1 @0x12"
 };
 
@@ -36,7 +35,6 @@ struct ContainerInfo {
     std::string frameType;           // SOF variant for JPEG, IHDR for PNG
     bool hasXmp = false;
     std::vector<EmbeddedExif> exifCandidates;   // JPEG/PNG/HEIF sources
-    std::vector<EmbeddedExif> extraPayloads;    // e.g. raw TIFF header
 };
 
 // Detect the container from magic bytes and fill in geometry + EXIF location.
