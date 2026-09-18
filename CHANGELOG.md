@@ -12,7 +12,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+* `fuzz/fuzz_exif.cc`, a libFuzzer harness covering the container sniffer, the
+  TIFF parser, all four renderers and thumbnail discovery, plus `make fuzz`
+  (needs clang), the `-DEXIFREADER_FUZZ=ON` CMake option and a CI job that runs
+  a short campaign on every push. The fuzzing claim in the security policy is
+  now reproducible from the repository.
+* Regression assertions for the exit status 2 message and for the `--max-nodes`
+  validation.
+
+### Changed
+
+* `--max-nodes` validates the way `--max-depth` does: a non-numeric value is
+  rejected with exit status 1 instead of being read as 0, an out-of-range value
+  is clamped with a note on stderr, and a negative literal no longer wraps
+  through `strtoull` into a huge budget.
+* Every output mode now reports a failed parse with the same words
+  (`no EXIF data`), and the JSON failure shape carries that reason in
+  `exif.error` instead of an empty string.
+* Documentation no longer hardcodes the size of the test suite, and the exit
+  status 2 rows agree between the README and the usage guide.
+
+### Fixed
+
+* `scripts/release.sh` deleted the body of the `[Unreleased]` section when it
+  inserted a new version, because it spliced from `## [Unreleased]` to the first
+  released heading. It now inserts the section in place and also refreshes the
+  `[Unreleased]` compare link and the new version's release link.
+
+### Removed
+
+* Dead configuration and helpers that were never wired to anything:
+  `RenderOptions::color`, `RenderOptions::showTypes`,
+  `ContainerInfo::extraPayloads`, `EmbeddedExif::payloadSize`,
+  `exif_common.hpp::halfToDouble` and `tiff_tags.hpp::makerNoteKind`.
 
 ## [1.0.1] - 2026-09-18
 
@@ -76,7 +110,7 @@ The first public release.
 * **Hostile-input hardening** across the whole parse path, with bounds checks,
   saturating offset arithmetic, directory cycle detection, recursion and
   directory budgets, and output escaping.
-* End-to-end test suite (`tests/run_tests.sh`, 43 assertions) over every output
+* End-to-end test suite (`tests/run_tests.sh`) over every output
   mode, driven by generated fixtures (`tests/make_fixtures.py`) with known
   on-disk byte layouts for JPEG, PNG, TIFF, big-endian TIFF, BigTIFF, HEIF and
   two MakerNote layouts.
