@@ -20,7 +20,11 @@
 #   --ssh / --https use an SSH remote (git@github.com:...) instead of HTTPS
 #   --public/--private   repository visibility       (default: public)
 #   --no-create     do not create the GitHub repository, only push
-#   --no-rewrite    do not touch the OWNER placeholders
+#   --no-rewrite    keep the OWNER placeholders untouched. This skips the
+#                   rewriting only, never the gate below: publishing a
+#                   SECURITY.md that points at a dead address is worse than
+#                   publishing none, because the reporter believes they have
+#                   made private contact and waits for a reply that never comes
 #   --dry-run       print what would happen, change nothing
 #
 # Environment fallbacks: OWNER, REPO_NAME, VISIBILITY, REMOTE, BRANCH, TAG, URL.
@@ -87,7 +91,10 @@ run() {
 # Paths that never hold placeholders meant for the published repository:
 # version control, build output, release artifacts, and this script itself
 # (whose sed expressions contain the literal placeholder).
-FIND_PLACEHOLDER='github.com/OWNER/exifreader'
+# github.com/OWNER/... and @OWNER are rewritten by the step below. The
+# placeholder domains are not rewriteable - they are somebody's real address or
+# nobody's - so they are reported instead.
+UNRESOLVED_PATTERNS='github\.com/OWNER|@OWNER|example\.com|example\.org|example\.net|your-email|changeme|REPLACE_ME'
 EXCLUDES='--exclude-dir=.git --exclude-dir=build --exclude-dir=build-cmake --exclude-dir=dist --exclude-dir=scripts'
 
 # --- 1. rewrite the OWNER placeholder -------------------------------------
@@ -110,17 +117,29 @@ if [ "$REWRITE" = 1 ]; then
         mv "$tmp" "$f"
         echo "   patched ${f#./}"
     done
+else
+    echo "-> --no-rewrite: leaving the OWNER placeholders in place (the gate below still runs)"
+fi
 
-    # A leftover placeholder in the working tree means a broken link would ship.
-    # (Skipped during --dry-run, where nothing has been patched by design.)
-    leftover=""
-    [ "$DRY_RUN" = 1 ] || leftover=$(grep -RIl -e "$FIND_PLACEHOLDER" . $EXCLUDES 2>/dev/null || true)
-    if [ -n "$leftover" ]; then
-        echo "   ERROR: these files still reference $FIND_PLACEHOLDER:" >&2
-        printf '     %s\n' $leftover >&2
-        echo "   refusing to publish with broken links" >&2
+# --- 1b. unresolved-placeholder gate ---------------------------------------
+# Always runs when publishing, including with --no-rewrite: that switch skips
+# the rewriting, not the safety check. Skipped only for --dry-run, where nothing
+# has been rewritten and a report is expected rather than a failure.
+if [ "$DRY_RUN" = 1 ]; then
+    echo "-> [dry-run] the unresolved-placeholder gate is not enforced"
+else
+    found=""
+    for f in $(grep -RIlE "$UNRESOLVED_PATTERNS" . $EXCLUDES 2>/dev/null || true); do
+        found=1
+        echo "   ERROR: unresolved placeholder in ${f#./}" >&2
+        grep -InE "$UNRESOLVED_PATTERNS" "$f" 2>/dev/null | head -5 | sed 's/^/       /' >&2
+    done
+    if [ -n "$found" ]; then
+        echo "   refusing to publish: the repository would ship broken URLs or" >&2
+        echo "   dead contact addresses. Fix the lines above." >&2
         exit 1
     fi
+    echo "-> no unresolved placeholders"
 fi
 
 # --- 2. git identity and repository ---------------------------------------

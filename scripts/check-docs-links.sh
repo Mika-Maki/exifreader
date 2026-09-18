@@ -51,6 +51,23 @@ for path in files:
         if not os.path.exists(resolved):
             problems.append(f'{path}: broken link -> {target}')
 
+# Documents that tell people where to report something must not point at a
+# placeholder address: a published SECURITY.md that says "email
+# security@example.com" is worse than no SECURITY.md at all, because the
+# reporter believes private contact was made and waits for a reply that never
+# comes. Only .invalid is allowed for illustrative examples (RFC 2606).
+contact_docs = ['SECURITY.md', 'SECURITY.zh-CN.md', 'CODE_OF_CONDUCT.md',
+                'CONTRIBUTING.md', 'CONTRIBUTING.zh-CN.md']
+placeholder_re = re.compile(r'example\.(com|org|net)\b')
+for path in contact_docs:
+    if not os.path.exists(path):
+        continue
+    with open(path, encoding='utf-8') as handle:
+        for number, line in enumerate(handle, 1):
+            if placeholder_re.search(line):
+                problems.append(
+                    f'{path}:{number}: placeholder contact address -> {line.strip()}')
+
 print(f'docs links: checked {len(files)} markdown files, {checked} relative links')
 if problems:
     for problem in problems:
