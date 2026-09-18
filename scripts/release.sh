@@ -71,14 +71,44 @@ ed CMakeLists.txt  "s/VERSION $CURRENT/VERSION $NEXT/"
 if ! grep -q "^## \[$NEXT\]" CHANGELOG.md; then
     if [ "$DRY_RUN" = 1 ]; then
         echo "  [dry-run] add ## [$NEXT] - $DATE to CHANGELOG.md"
+        echo "  [dry-run] point the [Unreleased] compare link at v$NEXT"
     else
-        tmp=$(mktemp)
-        {
-            sed -n '1,/^## \[Unreleased\]/p' CHANGELOG.md
-            printf '\n## [%s] - %s\n\n### Added\n\n- TODO: describe the release.\n\n### Changed\n\n- TODO\n\n### Fixed\n\n- TODO\n' "$NEXT" "$DATE"
-            sed -n '/^## \[[0-9]/,$p' CHANGELOG.md
-        } > "$tmp"
-        mv "$tmp" CHANGELOG.md
+        slug=$(git remote get-url origin 2>/dev/null | sed -e 's|.*github\.com[:/]||' -e 's|\.git$||')
+        python3 - "$NEXT" "$DATE" "$slug" <<'PY'
+import re
+import sys
+
+next_version, date, slug = sys.argv[1], sys.argv[2], sys.argv[3]
+path = 'CHANGELOG.md'
+text = open(path, encoding='utf-8').read()
+
+# Insert the new section immediately before the first released version, so the
+# [Unreleased] heading and everything under it survive untouched. The previous
+# implementation spliced from '## [Unreleased]' to the first '## [x.y.z]' and
+# silently deleted whatever sat between the two.
+section = (f'## [{next_version}] - {date}\n\n'
+           '### Added\n\n- TODO: describe the release.\n\n'
+           '### Changed\n\n- TODO\n\n'
+           '### Fixed\n\n- TODO\n\n')
+match = re.search(r'(?m)^## \[\d', text)
+if match:
+    text = text[:match.start()] + section + text[match.start():]
+else:
+    text = text.rstrip('\n') + '\n\n' + section
+
+# Keep the compare links honest: [Unreleased] has to compare from the version we
+# just cut, and the new version needs its release link.
+if slug:
+    text = re.sub(r'(?m)^\[Unreleased\]:.*$',
+                  f'[Unreleased]: https://github.com/{slug}/compare/v{next_version}...HEAD',
+                  text)
+    if not re.search(r'(?m)^\[' + re.escape(next_version) + r'\]:', text):
+        text = re.sub(r'(?m)^(\[Unreleased\]:.*)$',
+                      r'\1\n[' + next_version + f']: https://github.com/{slug}/releases/tag/v{next_version}',
+                      text, count=1)
+
+open(path, 'w', encoding='utf-8').write(text)
+PY
     fi
 fi
 
