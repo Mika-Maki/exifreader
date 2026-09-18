@@ -14,6 +14,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet.
 
+## [1.0.1] - 2026-09-18
+
+### Fixed
+
+* **Use-after-free in the tag index cache.** `indexFor()` returned a reference
+  to an element of a `std::vector` while releasing the mutex on the way out, so
+  the next table that grew the cache reallocated the vector and left the caller
+  holding a dangling reference. The cache is a `std::deque` now, whose
+  `push_back` never invalidates references to existing elements.
+* **Dead contact addresses in the published repository.** `SECURITY.md` and its
+  Chinese edition pointed reporters at `security@example.com`, and
+  `CODE_OF_CONDUCT.md` and both `CONTRIBUTING` files at
+  `conduct@example.com`. GitHub private vulnerability reporting was disabled as
+  well, so the advisory link in the security policy was dead too: a reporter had
+  no working channel and would have waited for a reply that could not arrive. The
+  security policy now uses private vulnerability reporting only (enabled on the
+  repository), states plainly that there is no security email, and offers a
+  no-details fallback for people who cannot use the form; conduct reports go to
+  GitHub's report abuse form, or to the private reporting form when the matter
+  is project-specific and must stay confidential.
+* `scripts/publish.sh --no-rewrite` skipped the unresolved-placeholder check
+  along with the rewriting, so a repository whose security policy pointed at a
+  placeholder address could still be published. The gate now runs on every real
+  publish regardless of `--no-rewrite`, and covers placeholder domains
+  (`example.com`/`.org`/`.net`, `your-email`, `changeme`, `REPLACE_ME`) as well
+  as `github.com/OWNER`, printing the offending file and line. The same rule is
+  enforced in CI for the contact-bearing documents.
+* The advisory `clang-format` job called `make format-check` directly, which put
+  a red cross on every commit even though the workflow succeeded; it reports the
+  differences as a warning annotation now.
+
 ## [1.0.0] - 2026-09-18
 
 The first public release.
@@ -90,5 +121,6 @@ release:
 * Classic MakerNotes embedded in a BigTIFF file were parsed with BigTIFF entry
   widths instead of their own header's format.
 
-[Unreleased]: https://github.com/Mika-Maki/exifreader/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Mika-Maki/exifreader/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/Mika-Maki/exifreader/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Mika-Maki/exifreader/releases/tag/v1.0.0
